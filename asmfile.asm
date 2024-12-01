@@ -1,46 +1,47 @@
 section .data
-	divisor db 255
-
-section .bss
-	result resq 1000
+    divisor dq 255.0 ; Divisor as a floating-point constant (double-precision)
 
 section .text
 bits 64
 default rel
 global imgCvtGrayIntToDouble
+
 imgCvtGrayIntToDouble:
     ; Arguments: 
     ; rcx = rows
-    ; rdx = height
-	; r8 = arr point
-	; r9 = result
-	
-    ; Load the array pointer (arr) into rsi
-    mov rax, rcx	; Move the value of rcx (rows) into rax
-    mul rdx 
-    mov rcx, rdx	; size of the array (passed as second argument)
-	
-	lea rdi, [r9] ; result buffer
-	lea rsi, [r8] 
-    ; Loop to process the array
+    ; rdx = cols
+    ; r8 = input array pointer (unsigned char*)
+    ; r9 = output array pointer (double*)
+
+    ; Calculate total number of elements: rcx = rows * cols
+    mov rax, rcx
+    mul rdx
+    mov rcx, rax        ; rcx now contains total number of pixels
+
+    ; rsi = input array pointer, rdi = output array pointer
+    mov rsi, r8
+    mov rdi, r9
+
 L1:
-	; Load the current element of the array into al
-    mov al, [rsi]        ; AL = *rsi (current element in the array)
+    ; Load current element from the input array into AL
+    movzx rax, byte [rsi] ; Zero-extend the byte to 64-bit register rax
 
-	xor ah, ah
-	mov dl, [divisor]
-	div dl
-	
-	cvtsi2sd xmm0, rax 
-	movsd [rdi], xmm0
-	
-    ; Move to the next element in the array
-    inc rsi                ; Move pointer to the next array element
-	add rsi, 8
-    ; Decrement the size counter (rcx)
-    dec rcx                ; Decrement rcx (loop counter)
-    jnz L1        ; Jump to start of loop if rcx != 0
+    ; Convert the integer to double (floating-point)
+    cvtsi2sd xmm0, rax    ; Convert rax (integer) to double in xmm0
 
-    xor rax, rax
+    ; Divide xmm0 by divisor (255.0)
+    movsd xmm1, qword [rel divisor] ; Load divisor into xmm1
+    divsd xmm0, xmm1                ; xmm0 = xmm0 / xmm1
+
+    ; Store the result in the output array
+    movsd qword [rdi], xmm0
+
+    ; Increment input and output pointers
+    inc rsi                ; Move to the next input element (byte)
+    add rdi, 8             ; Move to the next output element (double)
+
+    ; Decrement the counter and loop
+    dec rcx
+    jnz L1
+
     ret
-
