@@ -9,3 +9,4 @@ nasm -f win64 -o asmfile.obj asmfile.asm
 gcc -m64 cfile.c asmfile.obj -o program.exe
 program.exe
 ```
+![alt text](image.png)
