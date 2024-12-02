@@ -1,5 +1,7 @@
 # x86-to-C-interface
-
+Group:
+- Dela Cruz, Rein
+- Naling, Sebstien
 ## How to run
 
 First, open cmd in respective root folder:
