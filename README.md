@@ -45,7 +45,8 @@ program.exe
 | 30         | 0.006000       |
 | *Avg Time* | *0.0018*      |
 
-
+## Analysis
+  The use of the assembly function has significantly improved the execution time of the program. Because even with input sizes as large as 100*100, the execution time of the function is 0 or so minimal that it becomes insignificant.
 
 ## Program Correctness
 ![alt text](image.png)
